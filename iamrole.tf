@@ -41,5 +41,29 @@ resource "aws_lambda_function" "hello-sandeep-lambda" {
 }
 
 
+resource "aws_cloudwatch_log_group" "sandeep-logs" {
+    name = "/aws/lambad/${aws_lambda_function.hello-sandeep-lambda.function_name}"
+    retention_in_days = 14
+}
+
+
+data "archive_file" "lambda_hello" {
+    type = "zip"
+    source_dir = "input-file/function.js"
+    output_dir = "output-zip/function.zip"
+}
+
+
+resource "aws_s3_object" "lambda_hello" {
+    bucket = aws_s3_bucket.my-s3-day8-1.id
+    key = function.zip
+    source = data.archive_file.lambda_hello.output_path
+    etag = file(data.archive_file.lambda_hello.output_path)
+}
+
+
+
+
+
 
 
